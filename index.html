@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>異物通報</title>
+<script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <style>
 *{box-sizing:border-box}
 body{font-family:-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif;margin:0;padding:20px;background:#f5f5f5;color:#333}
@@ -29,15 +30,14 @@ button:disabled{background:#aaa}
 <p id="msg"></p>
 </div>
 <script>
+var LIFF_ID = "2012056969-Le2wDP1o";
 var API_URL = "https://yziolqokktledpibgmoa.supabase.co/functions/v1/line-webhook";
 var msg = document.getElementById("msg");
 var btn = document.getElementById("submitBtn");
 function setMsg(t, cls){ msg.textContent = t; msg.className = cls || "";}
-// 群組 ID 從網址參數取得（由 bot 按鈕帶入），免 LIFF、免認證
-var targetId = new URLSearchParams(window.location.search).get("groupId") || "";
-if(!targetId){
-  setMsg("此表單需從 LINE 群組內的通報選單開啟", "err");
-  btn.disabled = true;
+async function init(){
+try { await liff.init({ liffId: LIFF_ID }); }
+catch(e){ setMsg("初始化失敗，請從 LINE 群組內重新開啟", "err"); btn.disabled = true; }
 }
 btn.addEventListener("click", async function(){
 var className = document.getElementById("className").value.trim();
@@ -47,6 +47,10 @@ if(!content){ setMsg("請輸入相關細節內容", "err"); return;}
 btn.disabled = true;
 setMsg("送出中…", "");
 try{
+var ctx = {};
+try { ctx = liff.getContext() || {}; } catch(e) {}
+var targetId = ctx.groupId || ctx.roomId || ctx.userId || "";
+if(!targetId){ setMsg("請從 LINE 群組中開啟此表單", "err"); btn.disabled = false; return;}
 var res = await fetch(API_URL, {
 method: "POST",
 headers: { "Content-Type": "application/json"},
@@ -54,13 +58,14 @@ body: JSON.stringify({ action: "submit-report", targetId: targetId, className: c
 });
 var data = await res.json().catch(function(){ return {};});
 if(!res.ok) throw new Error(data.error || ("HTTP " + res.status));
-setMsg("已送出，請回到群組上傳異物照片", "ok");
-setTimeout(function(){ window.close(); }, 1500);
+setMsg("已送出，請接著上傳異物照片", "ok");
+setTimeout(function(){ try { liff.closeWindow(); } catch(e){ window.close(); } }, 1200);
 }catch(e){
 setMsg("送出失敗：" + e.message + "，請重試", "err");
 btn.disabled = false;
 }
 });
+init();
 </script>
 </body>
 </html>
