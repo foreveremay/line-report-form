@@ -21,9 +21,9 @@ button:disabled{background:#aaa}
 <body>
 <div class="card">
 <h1>異物通報</h1>
-<label for="className">班級</label>
-<input id="className" type="text" placeholder="請輸入班級" autocomplete="off">
-<label for="content">內容</label>
+<label for="className">輸入發生地點（班級/座號）</label>
+<input id="className" type="text" placeholder="例如：大忠班/25號" autocomplete="off">
+<label for="content">相關細節內容</label>
 <textarea id="content" placeholder="請描述異物狀況"></textarea>
 <button id="submitBtn">送出</button>
 <p id="msg"></p>
@@ -42,8 +42,8 @@ if(!targetId){
 btn.addEventListener("click", async function(){
 var className = document.getElementById("className").value.trim();
 var content = document.getElementById("content").value.trim();
-if(!className){ setMsg("請輸入班級", "err"); return;}
-if(!content){ setMsg("請輸入內容", "err"); return;}
+if(!className){ setMsg("請輸入發生地點", "err"); return;}
+if(!content){ setMsg("請輸入相關細節內容", "err"); return;}
 btn.disabled = true;
 setMsg("送出中…", "");
 try{
