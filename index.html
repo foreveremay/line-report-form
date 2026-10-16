@@ -47,10 +47,16 @@ if(!content){ setMsg("請輸入相關細節內容", "err"); return;}
 btn.disabled = true;
 setMsg("送出中…", "");
 try{
-var ctx = {};
-try { ctx = liff.getContext() || {}; } catch(e) {}
-var targetId = ctx.groupId || ctx.roomId || ctx.userId || "";
-if(!targetId){ setMsg("請從 LINE 群組中開啟此表單", "err"); btn.disabled = false; return;}
+var targetId = "";
+// 優先從網址參數取（直接開網頁版按鈕）
+targetId = new URLSearchParams(window.location.search).get("groupId") || "";
+// 沒有才用 LIFF context（liff.line.me 開啟）
+if(!targetId){
+  var ctx = {};
+  try { ctx = liff.getContext() || {}; } catch(e) {}
+  targetId = ctx.groupId || ctx.roomId || ctx.userId || "";
+}
+if(!targetId){ setMsg("請從 LINE 群組內的通報選單重新開啟", "err"); btn.disabled = false; return;}
 var res = await fetch(API_URL, {
 method: "POST",
 headers: { "Content-Type": "application/json"},
