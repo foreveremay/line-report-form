@@ -38,6 +38,11 @@ var btn = document.getElementById("submitBtn");
 function setMsg(t, cls){ msg.textContent = t; msg.className = cls || "";}
 // 一次性 token 從網址參數取得（bot 發選單時產生並綁定群組）
 var token = new URLSearchParams(window.location.search).get("token") || "";
+// 除錯顯示：讓測試時一眼看出 LIFF 有沒有把參數傳過來
+var dbg = document.createElement("p");
+dbg.style.cssText = "font-size:11px;color:#999;word-break:break-all;margin-top:8px;";
+dbg.textContent = "URL: " + window.location.href + " | token: " + (token ? "✓有" : "✗無");
+document.querySelector(".card").appendChild(dbg);
 if(!token){
   setMsg("此表單需從 LINE 群組內的通報選單開啟", "err");
   btn.disabled = true;
